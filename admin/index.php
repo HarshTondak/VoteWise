@@ -2,7 +2,6 @@
     require_once("inc/header.php");
     require_once("inc/navigation.php");
 
-
     if(isset($_GET['homepage']))
     {
         require_once("inc/homepage.php");
@@ -16,7 +15,6 @@
     {
         require_once("inc/viewResults.php");
     }
-
 ?>
 
 
