@@ -15,72 +15,81 @@ $election_id = $_GET['viewResult'];
             while ($data = mysqli_fetch_assoc($fetchingActiveElections)) {
                 $election_id = $data['id'];
                 $election_topic = $data['election_topic'];
-                ?>
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th colspan="4" class="bg-green text-white">
-                                <h5 class="font-weight-bold font-italic"> ELECTION TOPIC:
-                                    <?php echo strtoupper($election_topic); ?>
-                                </h5>
-                            </th>
-                        </tr>
-                        <tr>
-                            <th style="text-decoration: underline;"> Photo </th>
-                            <th style="text-decoration: underline;"> Candidate Details </th>
-                            <th style="text-decoration: underline;"> # of Votes </th>
-                            <!-- <th> Action </th> -->
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php
-                        // FETCHING THE CANDIDATE DETAILS...
-                
-                        // Sorts the candidates data into DESC order w.r.t. theirs vote counts
-                        $sql_candidate_details = "
-                                    SELECT
-                                        c.id AS candidate_id,
-                                        c.candidate_name,
-                                        c.candidate_details,
-                                        c.candidate_photo,
-                                        COUNT(v.id) AS total_votes
-                                    FROM
-                                        candidate_details c
-                                    LEFT JOIN
-                                        votings v ON c.id = v.candidate_id
-                                    GROUP BY
-                                        c.id, c.candidate_name, c.candidate_details, c.candidate_photo
-                                    ORDER BY
-                                        total_votes DESC;
-                                ";
 
-                        // Shows the candidates data without any sorting...
-                        // $fetchingCandidates = mysqli_query($db, "SELECT * FROM candidate_details WHERE election_id = '" . $election_id . "'") or die(mysqli_error($db));
-                        $fetchingCandidates = mysqli_query($db, $sql_candidate_details) or die(mysqli_error($db));
+                // FETCHING THE CANDIDATE DETAILS...
+                // Sorts the candidates data into DESC order w.r.t. theirs vote counts
+                $sql_candidate_details = "
+                            SELECT
+                                c.id AS candidate_id,
+                                c.candidate_name,
+                                c.candidate_details,
+                                c.candidate_photo,
+                                c.election_id,
+                                COUNT(v.id) AS total_votes
+                            FROM
+                                candidate_details c
+                            LEFT JOIN
+                                votings v ON c.id = v.candidate_id
+                            WHERE c.election_id = $election_id
+                            GROUP BY
+                                c.id, c.candidate_name, c.candidate_details, c.candidate_photo
+                            ORDER BY
+                                total_votes DESC;
+                        ";
+                // Shows the candidates data without any sorting...
+                // $fetchingCandidates = mysqli_query($db, "SELECT * FROM candidate_details WHERE election_id = '" . $election_id . "'") or die(mysqli_error($db));
+                $fetchingCandidates = mysqli_query($db, $sql_candidate_details) or die(mysqli_error($db));
+                $number_of_candidates = mysqli_num_rows($fetchingCandidates);
 
-                        while ($candidateData = mysqli_fetch_assoc($fetchingCandidates)) {
-                            $candidate_id = $candidateData['candidate_id'];
-                            $candidate_photo = $candidateData['candidate_photo'];
-
-                            // Fetching the Candidate's Vote Count...
-                            $fetchingVotes = mysqli_query($db, "SELECT * FROM votings WHERE candidate_id = '" . $candidate_id . "'") or die(mysqli_error($db));
-                            $totalVotes = mysqli_num_rows($fetchingVotes);
-                            ?>
+                // Checking if candidates are decided for the election or not...
+                if ($number_of_candidates > 0) {
+                    ?>
+                    <table class="table">
+                        <thead>
                             <tr>
-                                <td> <img src="<?php echo $candidate_photo; ?>" class="candidate_photo"> </td>
-                                <td>
-                                    <?php echo "<b>" . $candidateData['candidate_name'] . "</b><br />" . $candidateData['candidate_details']; ?>
-                                </td>
-                                <td>
-                                    <?php echo $totalVotes; ?>
-                                </td>
+                                <th colspan="4" class="bg-green text-white">
+                                    <h5 class="font-weight-bold font-italic"> ELECTION TOPIC:
+                                        <?php echo strtoupper($election_topic); ?>
+                                    </h5>
+                                </th>
                             </tr>
+                            <tr>
+                                <th style="text-decoration: underline;"> Photo </th>
+                                <th style="text-decoration: underline;"> Candidate Details </th>
+                                <th style="text-decoration: underline;"> # of Votes </th>
+                                <!-- <th> Action </th> -->
+                            </tr>
+                        </thead>
+                        <tbody>
                             <?php
-                        }
-                        ?>
-                    </tbody>
+                            while ($candidateData = mysqli_fetch_assoc($fetchingCandidates)) {
+                                $candidate_id = $candidateData['candidate_id'];
+                                $candidate_photo = $candidateData['candidate_photo'];
 
-                </table>
+                                // Fetching the Candidate's Vote Count...
+                                $fetchingVotes = mysqli_query($db, "SELECT * FROM votings WHERE candidate_id = '" . $candidate_id . "'") or die(mysqli_error($db));
+                                $totalVotes = mysqli_num_rows($fetchingVotes);
+                                ?>
+                                <tr>
+                                    <td> <img src="<?php echo $candidate_photo; ?>" class="candidate_photo"> </td>
+                                    <td>
+                                        <?php echo "<b>" . $candidateData['candidate_name'] . "</b><br />" . $candidateData['candidate_details']; ?>
+                                    </td>
+                                    <td>
+                                        <?php echo $totalVotes; ?>
+                                    </td>
+                                </tr>
+                                <?php
+                            }
+                            ?>
+                        </tbody>
+
+                    </table>
+                    <?php
+                } else {
+                    echo "Candidates are not decided yet!";
+                }
+                ?>
                 <?php
             }
         } else {
@@ -126,7 +135,6 @@ $election_id = $_GET['viewResult'];
                         $contact_no = $userData['contact_no'];
                     }
 
-
                     $fetchingCandidateName = mysqli_query($db, "SELECT * FROM candidate_details WHERE id = '" . $candidate_id . "'") or die(mysqli_error($db));
                     $isDataAvailable = mysqli_num_rows($fetchingCandidateName);
                     $candidateData = mysqli_fetch_assoc($fetchingCandidateName);
@@ -165,6 +173,5 @@ $election_id = $_GET['viewResult'];
 
         ?>
         </table>
-
     </div>
 </div>
