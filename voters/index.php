@@ -58,18 +58,20 @@ require_once("inc/navigation.php");
                                     $checkIfVoteCasted = mysqli_query($db, "SELECT * FROM votings WHERE voters_id = '" . $_SESSION['user_id'] . "' AND election_id = '" . $election_id . "'") or die(mysqli_error($db));
                                     $isVoteCasted = mysqli_num_rows($checkIfVoteCasted);
 
+                                    // If vote is casted...
                                     if ($isVoteCasted > 0) {
                                         $voteCastedData = mysqli_fetch_assoc($checkIfVoteCasted);
                                         $voteCastedToCandidate = $voteCastedData['candidate_id'];
 
                                         if ($voteCastedToCandidate == $candidate_id) {
                                             ?>
-
+                                            <!-- Show the image of Vote Casted -->
                                             <img src="../assets/images/vote.png" width="100px;">
                                             <?php
                                         }
                                     } else {
                                         ?>
+                                        <!-- You can cast the vote -->
                                         <button class="btn btn-md btn-success"
                                             onclick="CastVote(<?php echo $election_id; ?>, <?php echo $candidate_id; ?>, <?php echo $_SESSION['user_id']; ?>)">
                                             Vote </button>
@@ -103,9 +105,11 @@ require_once("inc/navigation.php");
 
 <script>
     const CastVote = (election_id, customer_id, voters_id) => {
+        // Ajax is used when we want to update the values without reloading the page
         $.ajax({
             type: "POST",
             url: "inc/ajaxCalls.php",
+            // "&" is used to show multiple values
             data: "e_id=" + election_id + "&c_id=" + customer_id + "&v_id=" + voters_id,
             success: function (response) {
 

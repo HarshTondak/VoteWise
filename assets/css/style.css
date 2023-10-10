@@ -1,3 +1,12 @@
+@font-face {
+  font-family: Candara;
+  src: url(assets/fonts/Candara.ttf);
+}
+
+body {
+  font-family: Candara;
+}
+
 .text-white {
   color: #fff;
 }
@@ -42,4 +51,19 @@
 .nav-item:hover {
   background-color: #79e63a;
   border-radius: 10px;
+}
+
+.custom-hr {
+  width: 50%;
+  height: 2px;
+  background-color: #333;
+  border: none;
+  margin: 50px 0;
+}
+
+.hr-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }

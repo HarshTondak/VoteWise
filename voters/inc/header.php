@@ -28,8 +28,8 @@ if ($_SESSION['key'] != "VotersKey") {
                 <img src="../assets/images/logo.gif" width="80px" />
             </div>
             <div class="col-11 my-auto">
-                <h3> ONLINE VOTING SYSTEM - <small> Welcome
-                        <?php echo $_SESSION['username']; ?>
+                <h3> ONLINE VOTING SYSTEM - <small> WELCOME
+                        <?php echo strtoupper($_SESSION['username']); ?>
                     </small> </h3>
             </div>
         </div>

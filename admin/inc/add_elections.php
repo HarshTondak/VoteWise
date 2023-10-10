@@ -7,7 +7,10 @@ if (isset($_GET['added'])) {
     <?php
 } else if (isset($_GET['delete_id'])) {
     $d_id = $_GET['delete_id'];
+    // Deleting the election
     mysqli_query($db, "DELETE FROM elections WHERE id = '" . $d_id . "'") or die(mysqli_error($db));
+    // Deleting the candidates for that election
+    mysqli_query($db, "DELETE FROM candidate_details WHERE election_id = '" . $d_id . "'") or die(mysqli_error($db));
     ?>
         <div class="alert alert-danger my-3" role="alert">
             Election has been deleted successfully!
@@ -24,14 +27,16 @@ if (isset($_GET['added'])) {
                 <input type="text" name="election_topic" placeholder="Election Topic" class="form-control" required />
             </div>
             <div class="form-group">
-                <input type="number" name="number_of_candidates" placeholder="No of Candidates" class="form-control"
+                <input type="number" name="number_of_candidates" placeholder="Number of Candidates" class="form-control"
                     required />
             </div>
             <div class="form-group">
+                <!-- On Clicking this input field, it's type will become DATE -->
                 <input type="text" onfocus="this.type='Date'" name="starting_date" placeholder="Starting Date"
                     class="form-control" required />
             </div>
             <div class="form-group">
+                <!-- On Clicking this input field, it's type will become DATE -->
                 <input type="text" onfocus="this.type='Date'" name="ending_date" placeholder="Ending Date"
                     class="form-control" required />
             </div>
@@ -49,8 +54,8 @@ if (isset($_GET['added'])) {
                     <th scope="col"># Candidates</th>
                     <th scope="col">Starting Date</th>
                     <th scope="col">Ending Date</th>
-                    <th scope="col">Status </th>
-                    <th scope="col">Action </th>
+                    <th scope="col">Status</th>
+                    <th scope="col">Action</th>
 
                 </tr>
             </thead>
@@ -122,15 +127,17 @@ if (isset($_POST['addElectionBtn'])) {
     $number_of_candidates = mysqli_real_escape_string($db, $_POST['number_of_candidates']);
     $starting_date = mysqli_real_escape_string($db, $_POST['starting_date']);
     $ending_date = mysqli_real_escape_string($db, $_POST['ending_date']);
+    // To keep the track of who inserted Elections and when
     $inserted_by = $_SESSION['username'];
     $inserted_on = date("Y-m-d");
 
-
+    // Checks if there is time in starting the elections...
     $date1 = date_create($inserted_on);
     $date2 = date_create($starting_date);
+    // date2 - date1
     $diff = date_diff($date1, $date2);
 
-
+    // If there is some time then it will show Inactive otherwise, Active
     if ((int) $diff->format("%R%a") > 0) {
         $status = "InActive";
     } else {

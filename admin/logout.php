@@ -1,7 +1,8 @@
-<?php 
-    session_start();
-    session_destroy();
-    session_unset();
+<?php
+session_start();
+// Ends all the SESSIONS
+session_destroy();
+session_unset();
 ?>
 
 <script>
